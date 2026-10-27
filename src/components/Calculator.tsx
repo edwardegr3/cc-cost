@@ -24,13 +24,13 @@ const EMPTY: CalculatorFields = {
 };
 
 const FIELDS: { key: keyof CalculatorFields; label: string; suffix: string; placeholder: string; hint?: string }[] = [
-  { key: "amountEur", label: "Loan amount", suffix: "€", placeholder: "3000" },
-  { key: "termMonths", label: "Term", suffix: "months", placeholder: "24" },
-  { key: "nominalRatePct", label: "Nominal annual interest rate", suffix: "%", placeholder: "12.5" },
-  { key: "contractFeeEur", label: "Contract fee", suffix: "€", placeholder: "0", hint: "One-off fee" },
-  { key: "monthlyFeeEur", label: "Monthly administration fee", suffix: "€", placeholder: "0" },
-  { key: "monthlyNetIncomeEur", label: "Monthly net income", suffix: "€", placeholder: "1800" },
-  { key: "existingDebtEur", label: "Existing monthly debt payments", suffix: "€", placeholder: "0", hint: "Enter 0 if none" },
+  { key: "amountEur", label: "Loan amount", suffix: "€", placeholder: "e.g. 3000" },
+  { key: "termMonths", label: "Term", suffix: "months", placeholder: "e.g. 24" },
+  { key: "nominalRatePct", label: "Nominal annual interest rate", suffix: "%", placeholder: "e.g. 12.5" },
+  { key: "contractFeeEur", label: "Contract fee", suffix: "€", placeholder: "0", hint: "One-off fee. Leave blank if none." },
+  { key: "monthlyFeeEur", label: "Monthly administration fee", suffix: "€", placeholder: "0", hint: "Leave blank if none." },
+  { key: "monthlyNetIncomeEur", label: "Monthly net income", suffix: "€", placeholder: "e.g. 1800" },
+  { key: "existingDebtEur", label: "Existing monthly debt payments", suffix: "€", placeholder: "0", hint: "Leave blank if none." },
 ];
 
 type Result = LoanResult & { dstiPct: number };

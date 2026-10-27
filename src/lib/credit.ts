@@ -80,19 +80,23 @@ export function validateCalculator(
   const errors: FieldErrors = {};
   const values = {} as Record<keyof CalculatorFields, number>;
 
-  const rules: Record<keyof CalculatorFields, { label: string; min: number; minExclusive?: boolean; max: number; integer?: boolean }> = {
+  // Fees and existing debt are optional: blank means 0.
+  const rules: Record<
+    keyof CalculatorFields,
+    { label: string; min: number; minExclusive?: boolean; max: number; integer?: boolean; optional?: boolean }
+  > = {
     amountEur: { label: "Loan amount", min: 0, minExclusive: true, max: LIMITS.maxAmountEur },
     termMonths: { label: "Term", min: 1, max: LIMITS.maxTermMonths, integer: true },
     nominalRatePct: { label: "Interest rate", min: 0, max: LIMITS.maxRatePct },
-    contractFeeEur: { label: "Contract fee", min: 0, max: LIMITS.maxFeeEur },
-    monthlyFeeEur: { label: "Monthly fee", min: 0, max: LIMITS.maxFeeEur },
+    contractFeeEur: { label: "Contract fee", min: 0, max: LIMITS.maxFeeEur, optional: true },
+    monthlyFeeEur: { label: "Monthly fee", min: 0, max: LIMITS.maxFeeEur, optional: true },
     monthlyNetIncomeEur: { label: "Monthly net income", min: 0, minExclusive: true, max: LIMITS.maxIncomeEur },
-    existingDebtEur: { label: "Existing debt payments", min: 0, max: LIMITS.maxIncomeEur },
+    existingDebtEur: { label: "Existing debt payments", min: 0, max: LIMITS.maxIncomeEur, optional: true },
   };
 
   for (const key of Object.keys(rules) as (keyof CalculatorFields)[]) {
     const rule = rules[key];
-    const n = parseField(fields[key]);
+    const n = parseField(fields[key]) ?? (rule.optional ? 0 : null);
     if (n === null) errors[key] = `${rule.label} is required.`;
     else if (Number.isNaN(n)) errors[key] = `${rule.label} must be a number.`;
     else if (n < 0) errors[key] = `${rule.label} cannot be negative.`;

@@ -114,6 +114,11 @@ export default function ChatAssistant({
 
   async function newChat(): Promise<string | null> {
     setError(null);
+    // Reuse the open chat if it is still empty, so repeated clicks don't pile up empty chats.
+    if (activeId && messages.length === 0) {
+      document.getElementById("chat-input")?.focus();
+      return activeId;
+    }
     try {
       const s = await api<ChatSessionDTO>("/api/chats", { method: "POST" });
       setSessions((list) => [s, ...list]);
@@ -262,7 +267,7 @@ export default function ChatAssistant({
 
       <div className="flex min-w-0 flex-col">
         <div className="flex flex-wrap items-center gap-2 border-b border-slate-200 p-3">
-          <div className="flex min-w-0 flex-1 items-center gap-2 md:hidden">
+          <div className="flex w-full min-w-0 items-center gap-2 md:hidden">
             <label htmlFor="chat-select" className="sr-only">
               Chat history
             </label>
@@ -279,7 +284,7 @@ export default function ChatAssistant({
                 </option>
               ))}
             </select>
-            <button type="button" onClick={newChat} className={`${btn} border-indigo-600 bg-indigo-600 text-white`}>
+            <button type="button" onClick={newChat} className={`${btn} shrink-0 whitespace-nowrap border-indigo-600 bg-indigo-600 text-white`}>
               <MessageSquarePlus className="h-3.5 w-3.5" aria-hidden />
               New Chat
             </button>
@@ -288,7 +293,7 @@ export default function ChatAssistant({
             <Bot className="h-5 w-5 text-indigo-600" aria-hidden />
             <span className="truncate text-sm font-semibold">{assistantName}</span>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 max-md:w-full max-md:justify-end">
             <button type="button" onClick={clearChat} disabled={!activeId || messages.length === 0 || busy} className={`${btn} border-slate-300 text-slate-700 hover:bg-slate-50`}>
               <Eraser className="h-3.5 w-3.5" aria-hidden />
               Clear Chat

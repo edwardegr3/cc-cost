@@ -48,7 +48,9 @@ export default function ProductComparison({ products }: { products: ProductDTO[]
     return <Card className="text-sm text-slate-600">No products have been loaded into the database yet.</Card>;
   }
 
-  const lowestTotal = rows.length >= 2 ? Math.min(...rows.map((r) => r.result.totalRepaymentEur)) : null;
+  // Only products that allow this amount and term can be the "lowest total".
+  const eligible = rows.filter((r) => !r.outOfRange);
+  const lowestTotal = rows.length >= 2 && eligible.length > 0 ? Math.min(...eligible.map((r) => r.result.totalRepaymentEur)) : null;
 
   function toggle(id: string) {
     setSelected((s) => (s.includes(id) ? s.filter((x) => x !== id) : s.length < MAX_SELECTED ? [...s, id] : s));
@@ -74,7 +76,7 @@ export default function ProductComparison({ products }: { products: ProductDTO[]
               return (
                 <label
                   key={p.id}
-                  className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition ${
+                  className={`flex cursor-pointer items-start gap-3 rounded-xl border p-3 text-sm transition focus-within:ring-2 focus-within:ring-indigo-300 ${
                     checked ? "border-indigo-400 bg-indigo-50" : "border-slate-200 bg-white hover:border-slate-300"
                   } ${disabled ? "cursor-not-allowed opacity-50" : ""}`}
                 >
@@ -123,7 +125,7 @@ export default function ProductComparison({ products }: { products: ProductDTO[]
                 product={product}
                 result={result}
                 outOfRange={outOfRange}
-                lowest={result.totalRepaymentEur === lowestTotal}
+                lowest={!outOfRange && result.totalRepaymentEur === lowestTotal}
               />
             ))}
           </div>
