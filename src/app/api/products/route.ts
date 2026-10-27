@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { productToDTO } from "@/lib/serialize";
+import { withDb } from "@/lib/db";
+import { productToDTO } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const products = await prisma.product.findMany({ orderBy: { id: "asc" } });
-  return NextResponse.json(products.map(productToDTO));
+  return withDb(async () => {
+    const products = await prisma.product.findMany({ orderBy: { id: "asc" } });
+    return NextResponse.json(products.map(productToDTO));
+  });
 }

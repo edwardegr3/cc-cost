@@ -1,5 +1,6 @@
-// Loads the product and FAQ CSVs into the database pointed to by DATABASE_URL.
-// Idempotent: rows are upserted, so it is safe to run more than once.
+// Loads the product and FAQ CSVs and default chat settings into the database
+// pointed to by DATABASE_URL. Idempotent: rows are upserted, chats are never
+// touched, so it runs safely on every start (see `npm start`).
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { PrismaClient } from "@prisma/client";
@@ -54,7 +55,7 @@ function readCsv(file: string) {
 }
 
 async function main() {
-  const products = readCsv("credit_products_railway.csv");
+  const products = readCsv("credit_products.csv");
   for (const p of products) {
     const data = {
       name: p.product_name,
@@ -71,7 +72,7 @@ async function main() {
     await prisma.product.upsert({ where: { id: p.product_id }, create: { id: p.product_id, ...data }, update: data });
   }
 
-  const faqs = readCsv("credit_faq_railway.csv");
+  const faqs = readCsv("credit_faq.csv");
   for (const f of faqs) {
     const data = {
       topic: f.topic,
@@ -84,7 +85,20 @@ async function main() {
     await prisma.faq.upsert({ where: { question: f.question }, create: { question: f.question, ...data }, update: data });
   }
 
-  console.log(`Seeded ${products.length} products and ${faqs.length} FAQ entries.`);
+  // Created once; later edits in the database are kept.
+  await prisma.chatSettings.upsert({
+    where: { id: "default" },
+    update: {},
+    create: {
+      id: "default",
+      welcomeMessage:
+        "Hi! I can explain credit costs, fees, DSTI and the synthetic example products in this demo. Please don't share personal or confidential information.",
+      fallbackMessage:
+        "Sorry, this demo does not have enough information to answer that. Try asking about interest rates, fees, total repayment, DSTI, early or late repayment, or the example products.",
+    },
+  });
+
+  console.log(`Seeded ${products.length} products, ${faqs.length} FAQ entries and chat settings.`);
 }
 
 main()

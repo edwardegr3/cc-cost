@@ -1,6 +1,9 @@
 -- CreateSchema
 CREATE SCHEMA IF NOT EXISTS "public";
 
+-- CreateEnum
+CREATE TYPE "MessageRole" AS ENUM ('user', 'assistant');
+
 -- CreateTable
 CREATE TABLE "Product" (
     "id" TEXT NOT NULL,
@@ -21,7 +24,7 @@ CREATE TABLE "Product" (
 );
 
 -- CreateTable
-CREATE TABLE "Faq" (
+CREATE TABLE "FAQ" (
     "id" SERIAL NOT NULL,
     "topic" TEXT NOT NULL,
     "question" TEXT NOT NULL,
@@ -30,35 +33,54 @@ CREATE TABLE "Faq" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "Faq_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "FAQ_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "Calculation" (
+CREATE TABLE "ChatSession" (
     "id" TEXT NOT NULL,
-    "productId" TEXT NOT NULL,
-    "amountEur" DECIMAL(12,2) NOT NULL,
-    "termMonths" INTEGER NOT NULL,
-    "monthlyNetIncomeEur" DECIMAL(12,2) NOT NULL,
-    "existingDebtEur" DECIMAL(12,2) NOT NULL,
-    "monthlyPaymentEur" DECIMAL(12,2) NOT NULL,
-    "totalRepaymentEur" DECIMAL(12,2) NOT NULL,
-    "totalCostEur" DECIMAL(12,2) NOT NULL,
-    "dstiPct" DECIMAL(7,2) NOT NULL,
+    "title" TEXT NOT NULL DEFAULT 'New chat',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ChatSession_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "Message" (
+    "id" TEXT NOT NULL,
+    "sessionId" TEXT NOT NULL,
+    "role" "MessageRole" NOT NULL,
+    "content" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT "Calculation_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "Message_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ChatSettings" (
+    "id" TEXT NOT NULL DEFAULT 'default',
+    "assistantName" TEXT NOT NULL DEFAULT 'Credit Compass Assistant',
+    "welcomeMessage" TEXT NOT NULL,
+    "fallbackMessage" TEXT NOT NULL,
+    "maxMessageLength" INTEGER NOT NULL DEFAULT 1000,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "ChatSettings_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Faq_question_key" ON "Faq"("question");
+CREATE UNIQUE INDEX "FAQ_question_key" ON "FAQ"("question");
 
 -- CreateIndex
-CREATE INDEX "Faq_topic_idx" ON "Faq"("topic");
+CREATE INDEX "FAQ_topic_idx" ON "FAQ"("topic");
 
 -- CreateIndex
-CREATE INDEX "Calculation_createdAt_idx" ON "Calculation"("createdAt");
+CREATE INDEX "ChatSession_updatedAt_idx" ON "ChatSession"("updatedAt");
+
+-- CreateIndex
+CREATE INDEX "Message_sessionId_createdAt_idx" ON "Message"("sessionId", "createdAt");
 
 -- AddForeignKey
-ALTER TABLE "Calculation" ADD CONSTRAINT "Calculation_productId_fkey" FOREIGN KEY ("productId") REFERENCES "Product"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Message" ADD CONSTRAINT "Message_sessionId_fkey" FOREIGN KEY ("sessionId") REFERENCES "ChatSession"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
