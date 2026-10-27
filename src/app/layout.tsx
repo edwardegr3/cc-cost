@@ -76,6 +76,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </p>
             </div>
           </div>
+          <div className="border-t border-slate-100">
+            <p className="mx-auto max-w-6xl px-4 py-4 text-center text-xs text-slate-500 sm:px-6">
+              © 2026 Consumer Credit Cost. Built with Claude Code
+            </p>
+          </div>
         </footer>
       </body>
     </html>
