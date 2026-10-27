@@ -1,0 +1,7 @@
+product_id,product_name,product_type,nominal_rate_pct,setup_fee_eur,monthly_fee_eur,min_amount_eur,max_amount_eur,min_term_months,max_term_months,notes
+CC-P01,Instalment Basic,Instalment,10.9,9.0,0.0,100,3000,3,24,Synthetic example. Fixed-term instalment product.
+CC-P02,Instalment Plus,Instalment,14.9,0.0,1.99,200,5000,6,36,Synthetic example. Monthly administration fee applies.
+CC-P03,Small Loan Flex,Small loan,18.9,29.0,2.99,500,10000,6,60,Synthetic example for larger financing needs.
+CC-P04,Small Loan Fixed,Small loan,21.9,0.0,0.0,500,5000,6,48,Synthetic example with no setup or monthly administration fee.
+CC-P05,Refinance Loan,Refinancing,15.9,49.0,0.0,1000,15000,12,72,Synthetic example intended for refinancing scenarios.
+CC-P06,Campaign 0% Instalment,Instalment,0.0,29.0,0.0,100,1500,3,12,Synthetic promotional scenario. 0% nominal interest does not mean zero total cost if a setup fee applies.

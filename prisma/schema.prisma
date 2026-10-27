@@ -1,0 +1,60 @@
+// Credit Compass data model. The database is Render PostgreSQL;
+// the connection string comes only from the DATABASE_URL env var.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// One row per line of credit_products_railway.csv.
+model Product {
+  id             String        @id // product_id, e.g. "CC-P01"
+  name           String
+  type           String
+  nominalRatePct Decimal       @db.Decimal(6, 3)
+  setupFeeEur    Decimal       @db.Decimal(10, 2)
+  monthlyFeeEur  Decimal       @db.Decimal(10, 2)
+  minAmountEur   Int
+  maxAmountEur   Int
+  minTermMonths  Int
+  maxTermMonths  Int
+  notes          String
+  calculations   Calculation[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+// One row per line of credit_faq_railway.csv.
+model Faq {
+  id        Int      @id @default(autoincrement())
+  topic     String
+  question  String   @unique
+  keywords  String[]
+  answer    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([topic])
+}
+
+// A saved cost & affordability calculation.
+model Calculation {
+  id                  String   @id @default(cuid())
+  product             Product  @relation(fields: [productId], references: [id])
+  productId           String
+  amountEur           Decimal  @db.Decimal(12, 2)
+  termMonths          Int
+  monthlyNetIncomeEur Decimal  @db.Decimal(12, 2)
+  existingDebtEur     Decimal  @db.Decimal(12, 2)
+  monthlyPaymentEur   Decimal  @db.Decimal(12, 2)
+  totalRepaymentEur   Decimal  @db.Decimal(12, 2)
+  totalCostEur        Decimal  @db.Decimal(12, 2)
+  dstiPct             Decimal  @db.Decimal(7, 2)
+  createdAt           DateTime @default(now())
+
+  @@index([createdAt])
+}
